@@ -191,6 +191,8 @@ public class ColumnFamilyStore implements ColumnFamilyStoreMBean
         return metadata.compactionStrategyClass.getName();
     }
 
+    public boolean getForceGcablePurge() { return metadata.forceGcablePurge(); }
+
     public Map<String,String> getCompressionParameters()
     {
         return metadata.compressionParameters().asThriftOptions();

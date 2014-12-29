@@ -143,6 +143,7 @@ public class CliClient
         DEFAULT_TIME_TO_LIVE,
         SPECULATIVE_RETRY,
         POPULATE_IO_CACHE_ON_FLUSH,
+        FORCE_GCABLE_PURGE,
     }
 
     private static final String DEFAULT_PLACEMENT_STRATEGY = "org.apache.cassandra.locator.NetworkTopologyStrategy";
@@ -1335,10 +1336,10 @@ public class CliClient
                 cfDef.setCompaction_strategy(CliUtils.unescapeSQLString(mValue));
                 break;
             case COMPACTION_STRATEGY_OPTIONS:
-                cfDef.setCompaction_strategy_options(getStrategyOptionsFromTree(statement.getChild(i+1)));
+                cfDef.setCompaction_strategy_options(getStrategyOptionsFromTree(statement.getChild(i + 1)));
                 break;
             case COMPRESSION_OPTIONS:
-                cfDef.setCompression_options(getStrategyOptionsFromTree(statement.getChild(i+1)));
+                cfDef.setCompression_options(getStrategyOptionsFromTree(statement.getChild(i + 1)));
                 break;
             case BLOOM_FILTER_FP_CHANCE:
                 cfDef.setBloom_filter_fp_chance(Double.parseDouble(mValue));
@@ -1360,6 +1361,9 @@ public class CliClient
                 break;
             case POPULATE_IO_CACHE_ON_FLUSH:
                 cfDef.setPopulate_io_cache_on_flush(Boolean.parseBoolean(mValue));
+                break;
+            case FORCE_GCABLE_PURGE:
+                //cfDef.setForce_gcable_purge(Boolean.parseBoolean(mValue));
                 break;
             default:
                 //must match one of the above or we'd throw an exception at the valueOf statement above.
@@ -1814,6 +1818,7 @@ public class CliClient
         writeAttr(output, false, "read_repair_chance", cfDef.read_repair_chance);
         writeAttr(output, false, "dclocal_read_repair_chance", cfDef.dclocal_read_repair_chance);
         writeAttr(output, false, "populate_io_cache_on_flush", cfDef.populate_io_cache_on_flush);
+        writeAttr(output, false, "force_gcable_purge", cfDef.force_gcable_purge);
         writeAttr(output, false, "gc_grace", cfDef.gc_grace_seconds);
         writeAttr(output, false, "min_compaction_threshold", cfDef.min_compaction_threshold);
         writeAttr(output, false, "max_compaction_threshold", cfDef.max_compaction_threshold);
@@ -2187,6 +2192,7 @@ public class CliClient
         sessionState.out.printf("      Read repair chance: %s%n", cf_def.read_repair_chance);
         sessionState.out.printf("      DC Local Read repair chance: %s%n", cf_def.dclocal_read_repair_chance);
         sessionState.out.printf("      Populate IO Cache on flush: %b%n", cf_def.populate_io_cache_on_flush);
+        sessionState.out.printf("      Force GCable Purge: %b%n", cf_def.force_gcable_purge);
         sessionState.out.printf("      Replicate on write: %s%n", cf_def.replicate_on_write);
         sessionState.out.printf("      Caching: %s%n", cf_def.caching);
         sessionState.out.printf("      Default time to live: %s%n", cf_def.default_time_to_live);

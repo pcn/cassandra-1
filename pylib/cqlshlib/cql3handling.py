@@ -70,6 +70,7 @@ class Cql3ParsingRuleSet(CqlParsingRuleSet):
         ('read_repair_chance', None),
         ('replicate_on_write', None),
         ('populate_io_cache_on_flush', None),
+        ('force_gcable_purge', None),
         ('default_time_to_live', None),
         ('speculative_retry', None),
         ('memtable_flush_period_in_ms', None),
@@ -445,7 +446,7 @@ def cf_prop_val_completer(ctxt, cass):
     if this_opt in ('read_repair_chance', 'bloom_filter_fp_chance',
                     'dclocal_read_repair_chance'):
         return [Hint('<float_between_0_and_1>')]
-    if this_opt in ('replicate_on_write', 'populate_io_cache_on_flush'):
+    if this_opt in ('replicate_on_write', 'populate_io_cache_on_flush', 'force_gcable_purge'):
         return ["'yes'", "'no'"]
     if this_opt in ('min_compaction_threshold', 'max_compaction_threshold',
                     'gc_grace_seconds', 'index_interval'):

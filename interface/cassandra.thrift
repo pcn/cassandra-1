@@ -474,6 +474,7 @@ struct CfDef {
     41: optional i32 index_interval,
     42: optional string speculative_retry="NONE",
     43: optional list<TriggerDef> triggers,
+    44: optional bool force_gcable_purge,
 
     /* All of the following are now ignored and unsupplied. */
 

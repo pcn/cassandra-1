@@ -42,6 +42,7 @@ public class CFPropDefs extends PropertyDefinitions
     public static final String KW_POPULATE_IO_CACHE_ON_FLUSH = "populate_io_cache_on_flush";
     public static final String KW_BF_FP_CHANCE = "bloom_filter_fp_chance";
     public static final String KW_MEMTABLE_FLUSH_PERIOD = "memtable_flush_period_in_ms";
+    public static final String KW_FORCE_GCABLE_PURGE = "force_gcable_purge";
 
     public static final String KW_COMPACTION = "compaction";
     public static final String KW_COMPRESSION = "compression";
@@ -67,6 +68,7 @@ public class CFPropDefs extends PropertyDefinitions
         keywords.add(KW_COMPACTION);
         keywords.add(KW_COMPRESSION);
         keywords.add(KW_MEMTABLE_FLUSH_PERIOD);
+        keywords.add(KW_FORCE_GCABLE_PURGE);
     }
 
     private Class<? extends AbstractCompactionStrategy> compactionStrategyClass = null;
@@ -159,6 +161,7 @@ public class CFPropDefs extends PropertyDefinitions
         cfm.memtableFlushPeriod(getInt(KW_MEMTABLE_FLUSH_PERIOD, cfm.getMemtableFlushPeriod()));
         cfm.populateIoCacheOnFlush(getBoolean(KW_POPULATE_IO_CACHE_ON_FLUSH, cfm.populateIoCacheOnFlush()));
         cfm.indexInterval(getInt(KW_INDEX_INTERVAL, cfm.getIndexInterval()));
+        cfm.forceGcablePurge(getBoolean(KW_FORCE_GCABLE_PURGE, cfm.forceGcablePurge()));
 
         if (compactionStrategyClass != null)
         {

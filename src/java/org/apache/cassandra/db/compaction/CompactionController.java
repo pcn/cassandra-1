@@ -67,6 +67,7 @@ public class CompactionController
         Set<SSTableReader> overlapping = compacting == null ? null : cfs.getAndReferenceOverlappingSSTables(compacting);
         this.overlappingSSTables = overlapping == null ? Collections.<SSTableReader>emptySet() : overlapping;
         this.overlappingTree = overlapping == null ? null : DataTracker.buildIntervalTree(overlapping);
+
     }
 
     public Set<SSTableReader> getFullyExpiredSSTables()
@@ -152,6 +153,8 @@ public class CompactionController
      */
     public boolean shouldPurge(DecoratedKey key, long maxDeletionTimestamp)
     {
+        boolean purge = true;
+
         List<SSTableReader> filteredSSTables = overlappingTree.search(key);
         for (SSTableReader sstable : filteredSSTables)
         {
@@ -160,12 +163,22 @@ public class CompactionController
                 // if we don't have bloom filter(bf_fp_chance=1.0 or filter file is missing),
                 // we check index file instead.
                 if (sstable.getBloomFilter() instanceof AlwaysPresentFilter && sstable.getPosition(key, SSTableReader.Operator.EQ, false) != null)
-                    return false;
+                {
+                    purge = false;
+                    break;
+                }
                 else if (sstable.getBloomFilter().isPresent(key.key))
-                    return false;
+                {
+                    purge = false;
+                    break;
+                }
             }
         }
-        return true;
+
+        if (cfs.getForceGcablePurge())
+            return true;
+        else
+            return purge;
     }
 
     public void invalidateCachedRow(DecoratedKey key)
