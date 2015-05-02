@@ -17,6 +17,7 @@
  */
 package org.apache.cassandra.db;
 
+import java.lang.Deprecated;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -344,4 +345,7 @@ public interface ColumnFamilyStoreMBean
      * @return ratio
      */
     public double getDroppableTombstoneRatio();
+
+    @Deprecated
+    public long getTotalForcePurgedRows();
 }

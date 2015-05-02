@@ -100,6 +100,8 @@ public class ColumnFamilyMetrics
     /** CAS Commit metrics */
     public final LatencyMetrics casCommit;
 
+    public final Counter forcePurgedRows;
+
     public final Timer coordinatorReadLatency;
     public final Timer coordinatorScanLatency;
 
@@ -453,6 +455,8 @@ public class ColumnFamilyMetrics
         casPrepare = new LatencyMetrics(factory, "CasPrepare", cfs.keyspace.metric.casPrepare);
         casPropose = new LatencyMetrics(factory, "CasPropose", cfs.keyspace.metric.casPropose);
         casCommit = new LatencyMetrics(factory, "CasCommit", cfs.keyspace.metric.casCommit);
+
+        forcePurgedRows = createColumnFamilyCounter("TotalForcePurgedRows");
     }
 
     public void updateSSTableIterated(int count)
