@@ -1195,6 +1195,11 @@ public class ColumnFamilyStore implements ColumnFamilyStoreMBean
         return getMemtableDataSize() + indexManager.getTotalLiveSize();
     }
 
+    public long getTotalForcePurgedRows()
+    {
+        return metric.forcePurgedRows.count();
+    }
+
     /**
      * @return the live size of all the memtables (the current active one and pending flush).
      */

@@ -31,6 +31,7 @@ import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.db.ColumnFamilyStore;
 import org.apache.cassandra.db.DataTracker;
 import org.apache.cassandra.db.DecoratedKey;
+import org.apache.cassandra.db.Keyspace;
 import org.apache.cassandra.io.sstable.SSTable;
 import org.apache.cassandra.io.sstable.SSTableIdentityIterator;
 import org.apache.cassandra.io.sstable.SSTableReader;
@@ -156,6 +157,8 @@ public class CompactionController
      */
     public boolean shouldPurge(DecoratedKey key, long maxDeletionTimestamp)
     {
+        boolean wouldHavePurged = true;
+
         List<SSTableReader> filteredSSTables = overlappingTree.search(key);
         for (SSTableReader sstable : filteredSSTables)
         {
@@ -163,12 +166,25 @@ public class CompactionController
             {
                 // if we don't have bloom filter(bf_fp_chance=1.0 or filter file is missing),
                 // we check index file instead.
-                if (sstable.getBloomFilter() instanceof AlwaysPresentFilter && sstable.getPosition(key, SSTableReader.Operator.EQ, false) != null)
-                    return false;
-                else if (sstable.getBloomFilter().isPresent(key.key))
-                    return false;
+                if (sstable.getBloomFilter() instanceof AlwaysPresentFilter && sstable.getPosition(key, SSTableReader.Operator.EQ, false) != null) {
+                    wouldHavePurged = false;
+                    break;
+                } else if (sstable.getBloomFilter().isPresent(key.key)) {
+                    wouldHavePurged = false;
+                    break;
+                }
             }
         }
+
+        /* Don't change behavior for System keyspace. */
+        if (getKeyspace().equals(Keyspace.SYSTEM_KS)) {
+            return wouldHavePurged;
+        }
+
+        if (!wouldHavePurged) {
+            cfs.metric.forcePurgedRows.inc();
+        }
+
         return true;
     }
 
