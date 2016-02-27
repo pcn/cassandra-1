@@ -18,7 +18,6 @@
 package org.apache.cassandra.db;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,18 +68,8 @@ public class SizeEstimatesRecorder extends MigrationListener implements Runnable
         Collection<Range<Token>> localRanges = StorageService.instance.getTokenMetadata().getPrimaryRangesFor(localTokens);
 
         for (Keyspace keyspace : Keyspace.nonSystem())
-        {
             for (ColumnFamilyStore table : keyspace.getColumnFamilyStores())
-            {
-                long start = System.nanoTime();
                 recordSizeEstimates(table, localRanges);
-                long passed = System.nanoTime() - start;
-                logger.trace("Spent {} milliseconds on estimating {}.{} size",
-                             TimeUnit.NANOSECONDS.toMillis(passed),
-                             table.metadata.ksName,
-                             table.metadata.cfName);
-            }
-        }
     }
 
     @SuppressWarnings("resource")
@@ -92,6 +81,7 @@ public class SizeEstimatesRecorder extends MigrationListener implements Runnable
         for (Range<Token> range : unwrappedRanges)
         {
             // filter sstables that have partitions in this range.
+            List<SSTableReader> sstables = null;
             Refs<SSTableReader> refs = null;
             long partitionsCount, meanPartitionSize;
 
@@ -104,8 +94,8 @@ public class SizeEstimatesRecorder extends MigrationListener implements Runnable
                 }
 
                 // calculate the estimates.
-                partitionsCount = estimatePartitionsCount(refs, range);
-                meanPartitionSize = estimateMeanPartitionSize(refs);
+                partitionsCount = estimatePartitionsCount(sstables, range);
+                meanPartitionSize = estimateMeanPartitionSize(sstables);
             }
             finally
             {
